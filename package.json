@@ -1,0 +1,16 @@
+{
+  "name": "proposal-genertor",
+  "version": "1.0.0",
+  "description": "generate proposals",
+  "scripts": {
+    "pull": "clasp pull",
+    "watch": "clasp push --watch",
+    "deploy": "clasp push"
+  },
+  "license": "MIT",
+  "author": "AEC Lab",
+  "devDependencies": {
+    "@types/google-apps-script": "^1.0.14"
+  },
+  "dependencies": {}
+}

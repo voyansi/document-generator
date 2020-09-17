@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "lib": ["es2017"],
+    "target": "es2017",
+    "types": ["google-apps-script"],
+    "strict": true,
+    "moduleResolution": "node",
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "allowJs": true,
+    "noEmitOnError": true,
+    "noErrorTruncation": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strictNullChecks": true,
+    "newLine": "lf",
+    "pretty": true,
+    "esModuleInterop": true
+  },
+  "exclude": ["**/*.test.ts", "node_modules"]
+}
