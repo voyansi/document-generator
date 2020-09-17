@@ -11,27 +11,47 @@
   <body>
     <div id="app">
       <v-app>
-        <v-main> {{ message }} </v-main>
+        <v-main>
+          <v-select :items="templates" label="Select Template" solo @change="templateSelected" item-text="name" item-value="id"></v-select>
+          {{ content }}
+        </v-main>
       </v-app>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
     <script>
       new Vue({
-        el: '#app',
+        el: "#app",
         vuetify: new Vuetify(),
         data: {
-          message: 'Proposal Generator',
+          templates: [],
+          content: "",
         },
         mounted() {
-          // google.script.run.withSuccessHandler((response) => {
-          //   this.setAssignments(response)
-          // }).withFailureHandler((error) => {
-          //   this.alert(error)
-          // }).getAssignments()
+          this.getTemplates()
         },
         computed: {},
         methods: {
+          getTemplates() {
+            google.script.run
+              .withSuccessHandler((response) => {
+                this.templates = response
+              })
+              .withFailureHandler((error) => {
+                this.alert(error)
+              })
+              .getTemplates()
+          },
+          templateSelected(id) {
+            google.script.run
+              .withSuccessHandler((response) => {
+                this.content = response
+              })
+              .withFailureHandler((error) => {
+                this.alert(error)
+              })
+              .getContents(id)
+          },
           alert(message) {
             console.error(message)
           },
@@ -40,3 +60,9 @@
     </script>
   </body>
 </html>
+
+<style lang="scss">
+  body {
+    margin: 12px;
+  }
+</style>

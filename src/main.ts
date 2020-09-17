@@ -1,5 +1,5 @@
 function onOpen() {
-  DocumentApp.getUi().createMenu('Proposal').addItem('Generate', 'showSidebar').addToUi()
+  DocumentApp.getUi().createMenu("Generate").addItem("Document", "showSidebar").addToUi()
 }
 
 function getUser() {
@@ -7,9 +7,9 @@ function getUser() {
 }
 
 function showSidebar() {
-  var html = HtmlService.createTemplateFromFile('client/sidebar.html')
+  var html = HtmlService.createTemplateFromFile("client/sidebar.html")
     .evaluate()
-    .setTitle('Proposal Generator')
+    .setTitle("Document Generator")
     .setWidth(400)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME)
 
