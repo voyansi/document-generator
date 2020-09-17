@@ -12,5 +12,8 @@
   "devDependencies": {
     "@types/google-apps-script": "^1.0.14"
   },
-  "dependencies": {}
+  "dependencies": {
+    "eslint": "^7.9.0",
+    "global": "^4.4.0"
+  }
 }

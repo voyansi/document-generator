@@ -1,5 +1,5 @@
 function onOpen() {
-  SpreadsheetApp.getUi().createMenu('Proposals').addItem('Launch', 'showSidebar').addToUi()
+  DocumentApp.getUi().createMenu('Proposal').addItem('Generate', 'showSidebar').addToUi()
 }
 
 function getUser() {
@@ -9,9 +9,9 @@ function getUser() {
 function showSidebar() {
   var html = HtmlService.createTemplateFromFile('client/sidebar.html')
     .evaluate()
-    .setTitle('Generate')
+    .setTitle('Proposal Generator')
     .setWidth(400)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME)
 
-  SpreadsheetApp.getUi().showSidebar(html)
+  DocumentApp.getUi().showSidebar(html)
 }
