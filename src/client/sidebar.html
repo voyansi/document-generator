@@ -13,7 +13,20 @@
       <v-app>
         <v-main>
           <v-select :items="templates" label="Select Template" solo @change="templateSelected" item-text="name" item-value="id"></v-select>
-          {{ content }}
+          <div v-if="sections.length" v-for="section in sections">
+            <v-select
+              :label="section"
+              :items="modules"
+              solo
+              item-text="name"
+              item-value="id"
+              @change="moduleSelected($event, section)"
+            ></v-select>
+            <div v-if="inputs[section]?.length">
+              <v-text-field v-for="input in inputs[section]" :label="input" @change="inputChanged($event, section, input)"></v-text-field>
+            </div>
+          </div>
+          <v-btn color="#f5d142" id="generate" @click="generate">Generate</v-btn>
         </v-main>
       </v-app>
     </div>
@@ -24,13 +37,18 @@
         el: "#app",
         vuetify: new Vuetify(),
         data: {
+          selectedTemplate: null,
+          selectedModules: {},
           templates: [],
-          content: "",
+          modules: [],
+          sections: [],
+          inputs: {},
+          forms: {},
         },
         mounted() {
           this.getTemplates()
+          this.getModules()
         },
-        computed: {},
         methods: {
           getTemplates() {
             google.script.run
@@ -42,15 +60,50 @@
               })
               .getTemplates()
           },
+          getModules() {
+            google.script.run
+              .withSuccessHandler((response) => {
+                this.modules = response
+              })
+              .withFailureHandler((error) => {
+                this.alert(error)
+              })
+              .getModules()
+          },
           templateSelected(id) {
             google.script.run
               .withSuccessHandler((response) => {
-                this.content = response
+                const sections = response.split("\n")
+                this.sections = sections
+                this.selectedTemplate = id
               })
               .withFailureHandler((error) => {
                 this.alert(error)
               })
               .getContents(id)
+          },
+          moduleSelected(id, section) {
+            google.script.run
+              .withSuccessHandler((response) => {
+                this.inputs[section] = response
+                this.selectedModules[section] = id
+                this.$forceUpdate()
+              })
+              .withFailureHandler((error) => {
+                this.alert(error)
+              })
+              .parseModule(id)
+          },
+          inputChanged(text, section, input) {
+            if (!this.forms[section]) this.forms[section] = {}
+            this.forms[section][input] = text
+          },
+          generate() {
+            console.log("Template: ", this.selectedTemplate)
+            console.log("Modules: ", this.selectedModules)
+            console.log("Sections: ", this.sections)
+            console.log("Inputs: ", this.inputs)
+            console.log("Forms: ", this.forms)
           },
           alert(message) {
             console.error(message)
@@ -63,6 +116,21 @@
 
 <style lang="scss">
   body {
-    margin: 12px;
+    margin: 5vw;
+  }
+  #generate {
+    position: fixed;
+    width: 90vw;
+    bottom: 5vw;
+  }
+  ::-webkit-scrollbar {
+    width: 0em;
+    height: 0em;
+  }
+  ::-webkit-scrollbar-button {
+    background: #ffffff;
+  }
+  ::-webkit-scrollbar-track-piece {
+    background: #ffffff;
   }
 </style>
