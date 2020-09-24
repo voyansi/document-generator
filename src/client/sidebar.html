@@ -13,7 +13,7 @@
       <v-app>
         <v-main>
           <v-select :items="templates" label="Select Template" solo @change="templateSelected" item-text="name" item-value="id"></v-select>
-          <div v-if="sections.length" v-for="section in sections">
+          <div v-if="sections.length" v-for="section in sections" :key="section">
             <v-select
               :label="section"
               :items="modules"
@@ -23,10 +23,15 @@
               @change="moduleSelected($event, section)"
             ></v-select>
             <div v-if="inputs[section]?.length">
-              <v-text-field v-for="input in inputs[section]" :label="input" @change="inputChanged($event, section, input)"></v-text-field>
+              <v-text-field
+                v-for="input in inputs[section]"
+                :key="input"
+                :label="input"
+                @change="inputChanged($event, section, input)"
+              ></v-text-field>
             </div>
           </div>
-          <v-btn color="#f5d142" id="generate" @click="generate">Generate</v-btn>
+          <v-btn class="text-capitalize" color="#f5d142" id="generate" @click="generate">Generate</v-btn>
         </v-main>
       </v-app>
     </div>
@@ -73,14 +78,13 @@
           templateSelected(id) {
             google.script.run
               .withSuccessHandler((response) => {
-                const sections = response.split("\n")
-                this.sections = sections
+                this.sections = response
                 this.selectedTemplate = id
               })
               .withFailureHandler((error) => {
                 this.alert(error)
               })
-              .getContents(id)
+              .parseDocument(id)
           },
           moduleSelected(id, section) {
             google.script.run
@@ -92,18 +96,50 @@
               .withFailureHandler((error) => {
                 this.alert(error)
               })
-              .parseModule(id)
+              .parseDocument(id)
           },
           inputChanged(text, section, input) {
             if (!this.forms[section]) this.forms[section] = {}
             this.forms[section][input] = text
           },
+          insertModule(id, forms) {
+            return new Promise((resolve, reject) => {
+              google.script.run
+                .withSuccessHandler(() => {
+                  resolve()
+                })
+                .withFailureHandler(() => {
+                  reject()
+                })
+                .insertModule(id, forms)
+            })
+          },
+          copyTemplate(id) {
+            return new Promise((resolve, reject) => {
+              google.script.run
+                .withSuccessHandler(() => {
+                  resolve()
+                })
+                .withFailureHandler(() => {
+                  reject()
+                })
+                .copyDocument(id)
+            })
+          },
           generate() {
-            console.log("Template: ", this.selectedTemplate)
-            console.log("Modules: ", this.selectedModules)
-            console.log("Sections: ", this.sections)
-            console.log("Inputs: ", this.inputs)
-            console.log("Forms: ", this.forms)
+            // console.log("Template: ", this.selectedTemplate)
+            // console.log("Modules: ", this.selectedModules)
+            // console.log("Sections: ", this.sections)
+            // console.log("Inputs: ", this.inputs)
+            // this.copyTemplate(this.selectedTemplate).then(() => {
+            this.sections.forEach(async (section) => {
+              await this.insertModule(this.selectedModules[section], this.forms[section])
+              await this.sleep(10000)
+            })
+            // })
+          },
+          sleep(delay) {
+            return new Promise((resolve) => setTimeout(resolve, delay))
           },
           alert(message) {
             console.error(message)

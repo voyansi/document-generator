@@ -24,14 +24,40 @@ const getModules = () => {
   return result.filter((n) => n.name.includes("<module:"))
 }
 
-const getContents = (id: string) => {
-  const doc = DocumentApp.openById(id)
-  const contents = doc.getBody().getText()
-  return contents
+const copyDocument = (id: string) => {
+  const targetDoc = DocumentApp.getActiveDocument().getBody()
+  const sourceDoc = DocumentApp.openById(id).getBody()
+  const totalElements = sourceDoc.getNumChildren()
+
+  for (var j = 0; j < totalElements; ++j) {
+    var element = sourceDoc.getChild(j).copy()
+    var type = element.getType()
+
+    switch (type) {
+      case DocumentApp.ElementType.PARAGRAPH:
+        targetDoc.appendParagraph(element)
+        break
+      case DocumentApp.ElementType.TABLE:
+        targetDoc.appendTable(element)
+        break
+      case DocumentApp.ElementType.LIST_ITEM:
+        targetDoc.appendListItem(element)
+        break
+      case DocumentApp.ElementType.INLINE_IMAGE:
+        targetDoc.appendImage(element)
+        break
+      case DocumentApp.ElementType.HORIZONTAL_RULE:
+        targetDoc.appendHorizontalRule(element)
+        break
+      case DocumentApp.ElementType.PAGE_BREAK:
+        targetDoc.appendPageBreak(element)
+        break
+    }
+  }
 }
 
-const parseModule = (id: string) => {
-  const searchPattern = "{([^,s}{][a-zA-Z]+)}"
+const parseDocument = (id: string) => {
+  const searchPattern = "{([a-zA-Z0-9]+)}"
   const doc = DocumentApp.openById(id)
   const body = doc.getBody().editAsText()
 
@@ -47,4 +73,14 @@ const parseModule = (id: string) => {
     foundElement = body.findText(searchPattern, foundElement)
   }
   return result
+}
+
+const insertModule = (id: string, forms: { [key: string]: string }) => {
+  copyDocument(id)
+  const body = DocumentApp.getActiveDocument().getBody().editAsText()
+  if (forms) {
+    Object.keys(forms).forEach((key) => {
+      body.replaceText(key, forms[key])
+    })
+  }
 }
