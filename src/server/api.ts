@@ -46,14 +46,13 @@ const copyDocument = (id: string) => {
       case DocumentApp.ElementType.INLINE_IMAGE:
         targetDoc.appendImage(element)
         break
-      case DocumentApp.ElementType.HORIZONTAL_RULE:
-        targetDoc.appendHorizontalRule(element)
-        break
       case DocumentApp.ElementType.PAGE_BREAK:
-        targetDoc.appendPageBreak(element)
+        targetDoc.appendPageBreak()
         break
     }
   }
+  targetDoc.appendPageBreak()
+  return
 }
 
 const parseDocument = (id: string) => {
@@ -75,12 +74,13 @@ const parseDocument = (id: string) => {
   return result
 }
 
-const insertModule = (id: string, forms: { [key: string]: string }) => {
+const copyModule = (id: string, forms: { [key: string]: string }) => {
   copyDocument(id)
-  const body = DocumentApp.getActiveDocument().getBody().editAsText()
   if (forms) {
+    const body = DocumentApp.getActiveDocument().getBody().editAsText()
     Object.keys(forms).forEach((key) => {
       body.replaceText(key, forms[key])
     })
   }
+  return
 }
