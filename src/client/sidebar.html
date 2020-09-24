@@ -31,7 +31,7 @@
               ></v-text-field>
             </div>
           </div>
-          <v-btn class="text-capitalize" color="#f5d142" id="generate" @click="generate">Generate</v-btn>
+          <v-btn class="text-capitalize" color="#f5d142" id="generate" @click="generate()">Generate</v-btn>
         </v-main>
       </v-app>
     </div>
@@ -104,42 +104,24 @@
           },
           insertModule(id, forms) {
             return new Promise((resolve, reject) => {
-              google.script.run
-                .withSuccessHandler(() => {
-                  resolve()
-                })
-                .withFailureHandler(() => {
-                  reject()
-                })
-                .insertModule(id, forms)
+              google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).insertModule(id, forms)
             })
           },
           copyTemplate(id) {
             return new Promise((resolve, reject) => {
-              google.script.run
-                .withSuccessHandler(() => {
-                  resolve()
-                })
-                .withFailureHandler(() => {
-                  reject()
-                })
-                .copyDocument(id)
+              google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).copyDocument(id)
             })
+          },
+          async asyncForEach(array, callback) {
+            for (let index = 0; index < array.length; index++) {
+              await callback(array[index], index, array)
+            }
           },
           generate() {
-            // console.log("Template: ", this.selectedTemplate)
-            // console.log("Modules: ", this.selectedModules)
-            // console.log("Sections: ", this.sections)
-            // console.log("Inputs: ", this.inputs)
             // this.copyTemplate(this.selectedTemplate).then(() => {
-            this.sections.forEach(async (section) => {
+            this.asyncForEach(this.sections, async (section) => {
               await this.insertModule(this.selectedModules[section], this.forms[section])
-              await this.sleep(10000)
             })
-            // })
-          },
-          sleep(delay) {
-            return new Promise((resolve) => setTimeout(resolve, delay))
           },
           alert(message) {
             console.error(message)
