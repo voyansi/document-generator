@@ -46,6 +46,4 @@ _Let's use Document Generator to create a proposal! The tool will allow us to se
 
 ### Caveats
 
-_the Google Documents API is still under development and has a few caveats..._
-
-- Document Generator is only able to copy over **inline** images!
+- If you're using images in your modules, Document Generator is only able to copy over **inline** images!
