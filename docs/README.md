@@ -46,4 +46,4 @@ _Let's use Document Generator to create a proposal! The tool will allow us to se
 
 ### Caveats
 
-- If you're using images in your modules, Document Generator is only able to copy over **inline** images!
+- If you're using images in your modules, make sure they are **inline** images, otherwise they won't copy over!
