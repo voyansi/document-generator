@@ -12,23 +12,28 @@
     <div id="app">
       <v-app>
         <v-main>
+          <v-overlay color="white" :opacity="0.75" :value="loading">
+            <v-progress-circular :size="50" color="amber" indeterminate></v-progress-circular>
+          </v-overlay>
           <v-select :items="templates" label="Select Template" solo @change="templateSelected" item-text="name" item-value="id"></v-select>
-          <div v-if="sections.length" v-for="section in sections" :key="section">
-            <v-select
-              :label="section"
-              :items="modules"
-              solo
-              item-text="name"
-              item-value="id"
-              @change="moduleSelected($event, section)"
-            ></v-select>
-            <div v-if="inputs[section]?.length">
-              <v-text-field
-                v-for="input in inputs[section]"
-                :key="input"
-                :label="input"
-                @change="inputChanged($event, section, input)"
-              ></v-text-field>
+          <div id="sections">
+            <div v-if="sections.length" v-for="section in sections" :key="section">
+              <v-select
+                :label="section"
+                :items="modules"
+                solo
+                item-text="name"
+                item-value="id"
+                @change="moduleSelected($event, section)"
+              ></v-select>
+              <div v-if="inputs[section]?.length">
+                <v-text-field
+                  v-for="input in inputs[section]"
+                  :key="input"
+                  :label="input"
+                  @change="inputChanged($event, section, input)"
+                ></v-text-field>
+              </div>
             </div>
           </div>
           <v-btn class="text-capitalize" color="#f5d142" id="generate" @click="generate()">Generate</v-btn>
@@ -49,31 +54,41 @@
           sections: [],
           inputs: {},
           forms: {},
+          loading: true,
         },
         mounted() {
-          this.getTemplates()
-          this.getModules()
+          Promise.all([this.getTemplates(), this.getModules()]).then(() => {
+            this.loading = false
+          })
         },
         methods: {
           getTemplates() {
-            google.script.run
-              .withSuccessHandler((response) => {
-                this.templates = response
-              })
-              .withFailureHandler((error) => {
-                this.alert(error)
-              })
-              .getTemplates()
+            return new Promise((resolve, reject) => {
+              google.script.run
+                .withSuccessHandler((response) => {
+                  this.templates = response
+                  resolve()
+                })
+                .withFailureHandler((error) => {
+                  this.alert(error)
+                  reject()
+                })
+                .getTemplates()
+            })
           },
           getModules() {
-            google.script.run
-              .withSuccessHandler((response) => {
-                this.modules = response
-              })
-              .withFailureHandler((error) => {
-                this.alert(error)
-              })
-              .getModules()
+            return new Promise((resolve, reject) => {
+              google.script.run
+                .withSuccessHandler((response) => {
+                  this.modules = response
+                  resolve()
+                })
+                .withFailureHandler((error) => {
+                  this.alert(error)
+                  reject()
+                })
+                .getModules()
+            })
           },
           templateSelected(id) {
             google.script.run
@@ -121,12 +136,20 @@
             }
           },
           generate() {
-            // TODO improve the asynchronous for loop!
+            this.loading = true
             this.asyncForEach(this.sections, async (section) => {
               const module = this.selectedModules[section]
               if (module) {
                 await this.copyModule(module, this.forms[section])
                 await this.sleep(1000)
+              }
+              if (this.sections.indexOf(section) == this.sections.length - 1) {
+                this.loading = false
+                // this.selectedTemplate = null
+                // this.selectedModules = {}
+                // this.sections = []
+                // this.inputs = {}
+                // this.forms = {}
               }
             })
           },
@@ -150,6 +173,9 @@
     position: fixed;
     width: 90vw;
     bottom: 5vw;
+  }
+  #sections {
+    margin-bottom: 30px;
   }
   ::-webkit-scrollbar {
     width: 0em;

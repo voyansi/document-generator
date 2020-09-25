@@ -63,7 +63,7 @@ const parseDocument = (id: string) => {
   let foundElement = body.findText(searchPattern)
   const result: string[] = []
   while (foundElement) {
-    let text = foundElement
+    const text = foundElement
       .getElement()
       .asText()
       .getText()
