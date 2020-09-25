@@ -121,9 +121,13 @@
             }
           },
           generate() {
+            // TODO improve the asynchronous for loop!
             this.asyncForEach(this.sections, async (section) => {
-              await this.copyModule(this.selectedModules[section], this.forms[section])
-              await this.sleep(1000)
+              const module = this.selectedModules[section]
+              if (module) {
+                await this.copyModule(module, this.forms[section])
+                await this.sleep(1000)
+              }
             })
           },
           sleep(delay) {
