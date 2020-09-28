@@ -1,9 +1,5 @@
 function onOpen() {
-  DocumentApp.getUi().createMenu("Generate").addItem("Document", "showSidebar").addToUi()
-}
-
-function getUser() {
-  return Session.getActiveUser().getEmail()
+  DocumentApp.getUi().createMenu("Generator").addItem("Open", "showSidebar").addToUi()
 }
 
 function showSidebar() {
