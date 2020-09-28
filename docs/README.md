@@ -10,9 +10,9 @@ _automatically generate Google Documents based on templates and modules_
 2. Decentralize authoring and avoid monolithic templates
 3. Have more fun
 
-### Setup
+### Use
 
-_install Document Generator_
+![](install.png)
 
 ### Templates
 
