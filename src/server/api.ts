@@ -1,5 +1,5 @@
 const getTemplates = () => {
-  const templates = DriveApp.searchFiles("title contains '<template:'")
+  const templates = DriveApp.searchFiles(`title contains "<template:"`)
   const result = []
   while (templates.hasNext()) {
     var file = templates.next()
