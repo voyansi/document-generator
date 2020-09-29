@@ -47,3 +47,4 @@ _Let's use Document Generator to create a proposal! The tool will allow us to se
 ### Caveats
 
 - If you're using images in your modules, make sure they are **inline** images, otherwise they won't copy over!
+- Make sure modules and templates you create are available on our [shared Google drive](https://drive.google.com/drive/folders/1VKnYUI9Q4j1BVCRurhqnVR2bV3OjMDbL) so everyone can use them!
