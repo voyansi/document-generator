@@ -18,14 +18,22 @@
           <v-select :items="templates" label="Select Template" solo @change="templateSelected" item-text="name" item-value="id"></v-select>
           <div id="sections">
             <div v-if="sections.length" v-for="section in sections" :key="section">
-              <v-select
+              <!-- <v-select
                 :label="section"
                 :items="modules"
                 solo
                 item-text="name"
                 item-value="id"
                 @change="moduleSelected($event, section)"
-              ></v-select>
+              ></v-select> -->
+              <v-autocomplete
+                :items="modules"
+                :label="section"
+                solo
+                item-text="name"
+                item-value="id"
+                @change="moduleSelected($event, section)"
+              ></v-autocomplete>
               <div v-if="inputs[section]?.length">
                 <v-text-field
                   v-for="input in inputs[section]"
@@ -55,39 +63,27 @@
           inputs: {},
           forms: {},
           loading: true,
+          value: null,
         },
         mounted() {
-          Promise.all([this.getTemplates(), this.getModules()]).then(() => {
+          this.getFiles().then(() => {
             this.loading = false
           })
         },
         methods: {
-          getTemplates() {
+          getFiles() {
             return new Promise((resolve, reject) => {
               google.script.run
                 .withSuccessHandler((response) => {
-                  this.templates = response
+                  this.templates = response.templates
+                  this.modules = response.modules
                   resolve()
                 })
                 .withFailureHandler((error) => {
                   this.alert(error)
                   reject()
                 })
-                .getTemplates()
-            })
-          },
-          getModules() {
-            return new Promise((resolve, reject) => {
-              google.script.run
-                .withSuccessHandler((response) => {
-                  this.modules = response
-                  resolve()
-                })
-                .withFailureHandler((error) => {
-                  this.alert(error)
-                  reject()
-                })
-                .getModules()
+                .getFiles()
             })
           },
           templateSelected(id) {

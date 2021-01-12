@@ -1,27 +1,35 @@
-const getTemplates = () => {
-  const templates = DriveApp.searchFiles("title contains '<template:'")
-  const result = []
-  while (templates.hasNext()) {
-    var file = templates.next()
-    const name = file.getName()
-    const id = file.getId()
-    result.push({ name, id })
-  }
-  // necessary filter step, driveapp search is fuzzy
-  return result.filter((n) => n.name.includes("<template:"))
+function getFiles() {
+  const templateFolderId = "1VKnYUI9Q4j1BVCRurhqnVR2bV3OjMDbL"
+  const folder = DriveApp.getFolderById(templateFolderId)
+  const pathContainer = ""
+  const files = getDriveFiles(folder, pathContainer)
+  const templates = files.filter((file: any) => file.name.includes("<template:"))
+  const modules = files.filter((file: any) => file.name.includes("<module:"))
+  return { templates, modules }
 }
 
-const getModules = () => {
-  const templates = DriveApp.searchFiles("title contains '<module:'")
-  const result = []
-  while (templates.hasNext()) {
-    var file = templates.next()
-    const name = file.getName()
-    const id = file.getId()
-    result.push({ name, id })
+function getFileData(file: GoogleAppsScript.Drive.File) {
+  const id = file.getId()
+  const name = file.getName()
+  return { id, name }
+}
+function getDriveFiles(folder: GoogleAppsScript.Drive.Folder, path: string): any {
+  const files = []
+  var path = path + "/" + folder.getName()
+
+  const fileIt = folder.getFiles()
+  while (fileIt.hasNext()) {
+    const f = fileIt.next()
+    files.push(getFileData(f))
   }
-  // necessary filter step, driveapp search is fuzzy
-  return result.filter((n) => n.name.includes("<module:"))
+
+  // Get all the sub-folders and iterate
+  const folderIt = folder.getFolders()
+  while (folderIt.hasNext()) {
+    const fs = getDriveFiles(folderIt.next(), path)
+    files.push(...fs)
+  }
+  return files
 }
 
 const copyDocument = (id: string) => {
@@ -35,16 +43,16 @@ const copyDocument = (id: string) => {
 
     switch (type) {
       case DocumentApp.ElementType.PARAGRAPH:
-        targetDoc.appendParagraph(element)
+        targetDoc.appendParagraph(element as any)
         break
       case DocumentApp.ElementType.TABLE:
-        targetDoc.appendTable(element)
+        targetDoc.appendTable(element as any)
         break
       case DocumentApp.ElementType.LIST_ITEM:
-        targetDoc.appendListItem(element)
+        targetDoc.appendListItem(element as any)
         break
       case DocumentApp.ElementType.INLINE_IMAGE:
-        targetDoc.appendImage(element)
+        targetDoc.appendImage(element as any)
         break
       case DocumentApp.ElementType.PAGE_BREAK:
         targetDoc.appendPageBreak()
